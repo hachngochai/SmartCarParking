@@ -1,0 +1,450 @@
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f4f6f8;
+    color: #333;
+    height: 100vh;
+    overflow: hidden; /* 🚫 body KHÔNG SCROLL */
+}
+
+
+header {
+    background: #222;
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 15px;
+    padding: 15px;
+}
+
+section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.slot {
+    height: 60px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.free { background: #2ecc71; }
+.busy { background: #e74c3c; }
+
+.dark {
+    background: #121212;
+    color: #000;
+}
+
+.scrollable {
+    max-height: 420px;   /* GIỮ NGUYÊN KHUNG */
+    overflow-y: auto;    /* THANH TRƯỢT */
+    padding-right: 6px;
+}
+
+/* Scroll đẹp hơn */
+.scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollable::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.parking {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+
+    height: 520px;        /* 🔒 KHÓA CHIỀU CAO */
+    display: flex;
+    flex-direction: column;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+
+    overflow-y: auto;     /* ✅ TRƯỢT BÊN TRONG */
+    flex: 1;              /* 🔒 KHÔNG LÀM GIÃN KHUNG */
+}
+
+button {
+    background: linear-gradient(135deg, #4CAF50, #2ecc71);
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* ===== CUSTOM SELECT ===== */
+.custom-select {
+    position: relative;
+    margin-bottom: 12px;
+    user-select: none;
+}
+
+.custom-select .selected {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+}
+
+.custom-select .selected:hover {
+    border-color: #2ecc71;
+}
+
+.custom-select .arrow {
+    transition: transform 0.25s;
+}
+
+.custom-select.open .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-select .options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    list-style: none;
+    padding: 6px 0;
+    margin: 0;
+    display: none;
+    z-index: 100;
+}
+
+.custom-select.open .options {
+    display: block;
+}
+
+.custom-select .options li {
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.custom-select .options li:hover {
+    background: #f0f9f4;
+    color: #2ecc71;
+}
+
+/* ===== VEHICLE CONTROL ===== */
+.vehicle-type {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.vehicle-option {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid #eee;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.vehicle-option.active {
+    border-color: #2ecc71;
+    background: #eafaf1;
+    color: #2ecc71;
+}
+
+.vehicle-option:hover {
+    transform: translateY(-2px);
+}
+
+/* Button chính */
+.primary-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.primary-btn:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* ===== MODAL QR ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    text-align: center;
+    width: 280px;
+}
+
+/* ===== QR CENTER ===== */
+.qr-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+}
+
+#qrCode {
+    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+#billInfo {
+    font-size: 13px;
+    text-align: left;
+    white-space: pre-line;
+    margin-bottom: 15px;
+}
+
+.plate-preview {
+    margin-top: 10px;
+    font-size: 14px;
+    background: #f6f6f6;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-left: 4px solid #2ecc71;
+}
+
+.camera-box {
+    position: relative;
+    height: 160px;
+    border-radius: 10px;
+    background: #000;
+    margin: 15px 0;
+    overflow: hidden;
+    color: #0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: lime;
+    animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+    from { top: 0; }
+    to { top: 100%; }
+}
+
+.vehicle-preview {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f8f9fb;
+    text-align: center;
+}
+
+.preview-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.vehicle-preview img {
+    width: 100%;
+    max-height: 140px;
+    object-fit: contain;
+    display: none;
+}
+
+.app-footer {
+    height: 50px;
+    background: linear-gradient(135deg, #1e272e, #485460);
+    color: #f1f2f6;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+    font-size: 14px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.app-footer div {
+    opacity: 0.9;
+}
+
+.app-footer a {
+    color: yellow;
+    text-decoration: none;
+    padding: 20px;
+}
+
+
+.contact-marquee {
+    width: 100%;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 6px;
+}
+
+.marquee-track {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: marquee 18s linear infinite;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+/* 🔥 DỪNG KHI ĐƯA CHUỘT VÀO */
+.contact-marquee:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+/* KEYFRAMES */
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.info-panel {
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    font-size: 14px;
+}
+
+/* ZONE INFO */
+.zone-info-panel {
+    margin-top: 14px;
+}
+
+.zone-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.zone-btn {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.zone-btn.active {
+    background: linear-gradient(135deg, #1dd1a1, #10ac84);
+}
+
+.zone-status-display {
+    display: flex;
+    gap: 10px;
+}
+
+.status-box {
+    flex: 1;
+    border-radius: 12px;
+    padding: 10px 0;
+    text-align: center;
+    color: white;
+}
+
+.status-box .label {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.status-box .count {
+    display: block;
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.status-box.free {
+    background: linear-gradient(135deg, #1dd1a1, #10ac84);
+}
+
+.status-box.busy {
+    background: linear-gradient(135deg, #ff6b6b, #ee5253);
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Car Parking</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Smart Car Parking</h1>
+        <!-- <button id="modeToggle" style="background-color: none;">🌙</button> -->
+    </header>
+
+    <main class="container">
+        <section class="control">
+            <h2>Vehicle Control</h2>
+            <div class="vehicle-type">
+                <div class="vehicle-option active" data-type="car">
+                    Car
+                </div>
+                <div class="vehicle-option" data-type="bike">
+                    Bike
+                </div>
+                <div class="vehicle-option" data-type="motorbike">
+                    Motorbike
+                </div>
+            </div>
+
+            <button id="parkBtn" class="primary-btn">
+                Parking (Scan Plate)
+            </button>
+
+            <p class="plate-preview">
+                Plate: <strong id="plateText">—</strong>
+            </p>
+
+            <div class="vehicle-preview">
+                <div class="preview-title">Captured Vehicle</div>
+                <img id="vehicleImage" src="" alt="Vehicle Image" />
+            </div>
+
+             <div class="modal" id="qrModal">
+                 <div class="modal-content">
+                <h3>Bill of payment</h3>
+                <div class="qr-wrapper">
+                <div id="qrCode"></div>
+            </div>
+            <p id="billInfo"></p>
+            <button onclick="closeQR()">Close</button>
+        </div>
+    </div>
+        </section>
+
+        <section class="parking">
+            <h2>Parking Slots</h2>
+            <div class="custom-select" id="zoneSelect">
+                <div class="selected">
+                    Zone A (100 slots)
+                    <span class="arrow">▾</span>
+                </div>
+                <ul class="options">
+                    <li data-zone="A">Zone A (100 slots)</li>
+                    <li data-zone="B">Zone B (90 slots)</li>
+                    <li data-zone="C">Zone C (95 slots)</li>
+                </ul>
+            </div>
+
+            <div id="parkingGrid" class="grid"></div>
+        </section>
+
+        <section class="info">
+            <h2>Info</h2>
+            <p id="status">Select a slot</p>
+            <p id="vehicleInfo">Vehicle: —</p>
+            <p id="plateInfo">Plate: —</p>
+            <p id="timer">Time: 00:00</p>
+            <p id="price">Price: 0 VND</p>
+
+            <div class="info-panel">
+
+                <!-- ZONE INFO -->
+                <div class="zone-info-panel">
+
+                    <!-- ZONE SELECT -->
+                    <!-- <div class="zone-selector">
+                        <button class="zone-btn active" data-zone="A">Zone A</button>
+                        <button class="zone-btn" data-zone="B">Zone B</button>
+                        <button class="zone-btn" data-zone="C">Zone C</button>
+                    </div> -->
+                    <div class="zone-selector" id="zoneSelector"></div>
+
+                    <!-- ZONE STATUS -->
+                    <div class="zone-status-display">
+                        <div class="status-box free">
+                            <span class="label">Free</span>
+                            <span class="count" id="freeCount">0</span>
+                        </div>
+
+                        <div class="status-box busy">
+                            <span class="label">Occupied</span>
+                            <span class="count" id="busyCount">0</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+        </section>
+
+        
+        <div class="modal" id="cameraModal">
+            <div class="modal-content">
+                <h3>The camera is scanning the license plate</h3>
+
+                <div class="camera-box">
+                    <div class="scan-line"></div>
+                    <p>Scanning...</p>
+                </div>
+
+                <button onclick="confirmPlate()" class="primary-btn">
+                    Accept
+                </button>
+            </div>
+        </div>
+
+        <div id="systemNotification" style="
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 300px;
+        ">
+            <strong>System notification</strong>
+            <p id="notifMessage"></p>
+            <button onclick="closeNotification()" style="
+                margin-top: 10px;
+                background: #3498db;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+            ">OK</button>
+        </div>
+
+    </main>
+
+   
+
+    <footer class="app-footer">
+        <a>CONTACT</a>
+  
+
+        <div class="contact-marquee">
+            <div class="marquee-track">
+                📞 Hotline: 0987654321 &nbsp;&nbsp;|&nbsp;&nbsp;
+                ✉️ Email: smartcarparking@gmail.com &nbsp;&nbsp;|&nbsp;&nbsp;
+                🌐 Website: smartcarparking.vn &nbsp;&nbsp;|&nbsp;&nbsp;
+                📍 Location: Ha Noi City
+            </div>
+        </div>
+    </footer>
+
+    
+
+   
+
+
+    <script src="js/data.js"></script>
+    <script src="js/pricing.js"></script>
+    <script src="js/parking.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://app.embed.im/spark.js" defer></script> 
+
+</body>
+</html>
