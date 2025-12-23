@@ -22,6 +22,8 @@ let activeSlot = null;
 let timerInterval = null;
 let detectedPlate = null;
 let currentVehicle = "car";
+let pendingSlot = null;
+
 
 /* ===================== DATA ===================== */
 const vehicleImages = {
@@ -41,16 +43,6 @@ document.querySelectorAll(".vehicle-option").forEach(opt => {
         currentVehicle = opt.dataset.type;
     };
 });
-
-function showNotification(message) {
-    const notif = document.getElementById("systemNotification");
-    document.getElementById("notifMessage").textContent = message;
-    notif.style.display = "block";
-}
-
-function closeNotification() {
-    document.getElementById("systemNotification").style.display = "none";
-}
 
 /* ===================== ZONE ===================== */
 function renderZoneButtons() {
@@ -100,73 +92,55 @@ function renderSlots() {
 }
 
 /* ===================== SLOT CLICK ===================== */
+// 
+
 function handleSlotClick(slot) {
 
-    // if (!slot.occupied && !detectedPlate) {
-    //     alert("Please scan license plate first!");
-    //     return;
-    // }
+    /* ===== CLICK SLOT ĐÃ CÓ XE ===== */
+    if (slot.occupied) {
+
+        activeSlot = slot; // set lại slot đang thao tác
+        pendingSlot = slot;
+
+        document.getElementById("confirmModal").style.display = "flex";
+        return;
+    }
+
+    /* ===== ĐỖ XE MỚI ===== */
     if (!detectedPlate) {
-           showNotification("Please scan vehicle plate first!");
-            return;
+        alert("Please scan license plate first!");
+        return;
     }
 
     const existed = isVehicleAlreadyParked(detectedPlate);
     if (existed) {
-       showNotification(`Vehicle already parked!\nZone: ${existed.zone}\nSlot: ${existed.slot}`);
+        alert(`Vehicle already parked!\nZone: ${existed.zone}\nSlot: ${existed.slot}`);
         return;
     }
 
-    if (!slot.occupied) {
-        
-        slot.occupied = true;
-        slot.startTime = Date.now();
-        slot.vehicle = currentVehicle;
-        slot.plate = detectedPlate;
-        activeSlot = slot;
+    slot.occupied = true;
+    slot.startTime = Date.now();
+    slot.vehicle = currentVehicle;
+    slot.plate = detectedPlate;
+    activeSlot = slot;
 
-        vehicleInfo.textContent = `Vehicle: ${currentVehicle}`;
-        plateInfo.textContent = `Plate: ${detectedPlate}`;
-        statusText.textContent =
-            `Parking at ${zones[currentZone].name} - Slot ${slot.id}`;
+    vehicleInfo.textContent = `Vehicle: ${currentVehicle}`;
+    plateInfo.textContent = `Plate: ${detectedPlate}`;
+    statusText.textContent =
+        `Parking at ${zones[currentZone].name} - Slot ${slot.id}`;
 
-        vehicleImageEl.src = vehicleImages[currentVehicle];
-        vehicleImageEl.style.display = "block";
-        const existed = isVehicleAlreadyParked(detectedPlate);
-      
+    vehicleImageEl.src = vehicleImages[currentVehicle];
+    vehicleImageEl.style.display = "block";
 
-        startTimer();
-    } else {
-        const minutes = Math.floor((Date.now() - slot.startTime) / 60000);
-        const price = calculatePrice(minutes);
+    startTimer();
 
-        showQRBill({
-            zone: zones[currentZone].name,
-            slot: slot.id,
-            vehicle: slot.vehicle,
-            plate: slot.plate,
-            time: minutes,
-            price
-        });
-
-        stopTimer();
-
-        slot.occupied = false;
-        slot.startTime = null;
-        slot.vehicle = null;
-        slot.plate = null;
-
-        detectedPlate = null;
-
-        vehicleInfo.textContent = "Vehicle: —";
-        plateInfo.textContent = "Plate: —";
-        statusText.textContent = "Select a slot";
-        vehicleImageEl.style.display = "none";
-        document.getElementById("plateText").textContent = "—";
-    }
+    /* 🔥 CLEAR BIỂN SỐ ĐỂ QUÉT XE KHÁC */
+    detectedPlate = null;
+    document.getElementById("plateText").textContent = "—";
 
     renderSlots();
 }
+
 
 function isVehicleAlreadyParked(plate) {
     for (const zoneKey in zones) {
@@ -272,6 +246,47 @@ Price: ${data.price} VND
     info.innerText = billText;
     modal.style.display = "flex";
 }
+
+document.getElementById("continueBtn").onclick = () => {
+    document.getElementById("confirmModal").style.display = "none";
+    pendingSlot = null;
+};
+
+document.getElementById("leaveBtn").onclick = () => {
+    document.getElementById("confirmModal").style.display = "none";
+
+    if (!pendingSlot) return;
+
+    const minutes = Math.floor((Date.now() - pendingSlot.startTime) / 60000);
+    const price = calculatePrice(minutes);
+
+    showQRBill({
+        zone: zones[currentZone].name,
+        slot: pendingSlot.id,
+        vehicle: pendingSlot.vehicle,
+        plate: pendingSlot.plate,
+        time: minutes,
+        price
+    });
+
+    stopTimer();
+
+    pendingSlot.occupied = false;
+    pendingSlot.startTime = null;
+    pendingSlot.vehicle = null;
+    pendingSlot.plate = null;
+
+    activeSlot = null;
+    pendingSlot = null;
+
+    vehicleInfo.textContent = "Vehicle: —";
+    plateInfo.textContent = "Plate: —";
+    statusText.textContent = "Select a slot";
+    vehicleImageEl.style.display = "none";
+
+    renderSlots();
+};
+
 
 function closeQR() {
     document.getElementById("qrModal").style.display = "none";
