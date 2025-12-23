@@ -125,8 +125,26 @@
                 </button>
             </div>
         </div>
+    </main>
 
-        <div id="systemNotification" style="
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>Vehicle already parked</h3>
+            <p>What do you want to do?</p>
+
+            <div style="display:flex; gap:10px; margin-top:15px">
+                <button class="primary-btn" id="continueBtn">
+                    Continue parking
+                </button>
+                <button class="danger-btn" id="leaveBtn">
+                    Leaving now
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+   <!-- <div id="systemNotification" style="
             display: none;
             position: fixed;
             top: 20px;
@@ -150,11 +168,7 @@
                 border-radius: 4px;
                 cursor: pointer;
             ">OK</button>
-        </div>
-
-    </main>
-
-   
+        </div> -->
 
     <footer class="app-footer">
         <a>CONTACT</a>

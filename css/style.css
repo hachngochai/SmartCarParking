@@ -207,7 +207,7 @@ button:active {
 /* Button chính */
 .primary-btn {
     width: 100%;
-    padding: 12px;
+    padding: 25px;
     border-radius: 10px;
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     border: none;
@@ -447,4 +447,14 @@ button:active {
 
 .status-box.busy {
     background: linear-gradient(135deg, #ff6b6b, #ee5253);
+}
+
+.danger-btn {
+    background: linear-gradient(135deg,#ff6b6b,#ee5253);
+    border:none;
+    width: 100%;
+    color:white;
+    padding:25px;
+    border-radius:10px;
+    cursor:pointer;
 }

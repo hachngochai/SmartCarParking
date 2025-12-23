@@ -21,12 +21,13 @@ var activeSlot = null;
 var timerInterval = null;
 var detectedPlate = null;
 var currentVehicle = "car";
+var pendingSlot = null;
 /* ===================== DATA ===================== */
 
 var vehicleImages = {
-  car: "assets/vehicles/car.png",
-  motorbike: "assets/vehicles/motorbike.png",
-  bike: "assets/vehicles/bike.png"
+  car: "assets/vehicles/car.jpg",
+  motorbike: "assets/vehicles/motorbike.jpg",
+  bike: "assets/vehicles/bike.jpg"
 };
 /* ===================== VEHICLE SELECT ===================== */
 
@@ -39,18 +40,7 @@ document.querySelectorAll(".vehicle-option").forEach(function (opt) {
     currentVehicle = opt.dataset.type;
   };
 });
-
-function showNotification(message) {
-  var notif = document.getElementById("systemNotification");
-  document.getElementById("notifMessage").textContent = message;
-  notif.style.display = "block";
-}
-
-function closeNotification() {
-  document.getElementById("systemNotification").style.display = "none";
-}
 /* ===================== ZONE ===================== */
-
 
 function renderZoneButtons() {
   zoneSelector.innerHTML = "";
@@ -100,64 +90,48 @@ function renderSlots() {
   updateZoneInfo();
 }
 /* ===================== SLOT CLICK ===================== */
+// 
 
 
 function handleSlotClick(slot) {
-  // if (!slot.occupied && !detectedPlate) {
-  //     alert("Please scan license plate first!");
-  //     return;
-  // }
+  /* ===== CLICK SLOT ĐÃ CÓ XE ===== */
+  if (slot.occupied) {
+    activeSlot = slot; // set lại slot đang thao tác
+
+    pendingSlot = slot;
+    document.getElementById("confirmModal").style.display = "flex";
+    return;
+  }
+  /* ===== ĐỖ XE MỚI ===== */
+
+
   if (!detectedPlate) {
-    showNotification("Please scan vehicle plate first!");
+    alert("Please scan license plate first!");
     return;
   }
 
   var existed = isVehicleAlreadyParked(detectedPlate);
 
   if (existed) {
-    showNotification("Vehicle already parked!\nZone: ".concat(existed.zone, "\nSlot: ").concat(existed.slot));
+    alert("Vehicle already parked!\nZone: ".concat(existed.zone, "\nSlot: ").concat(existed.slot));
     return;
   }
 
-  if (!slot.occupied) {
-    slot.occupied = true;
-    slot.startTime = Date.now();
-    slot.vehicle = currentVehicle;
-    slot.plate = detectedPlate;
-    activeSlot = slot;
-    vehicleInfo.textContent = "Vehicle: ".concat(currentVehicle);
-    plateInfo.textContent = "Plate: ".concat(detectedPlate);
-    statusText.textContent = "Parking at ".concat(zones[currentZone].name, " - Slot ").concat(slot.id);
-    vehicleImageEl.src = vehicleImages[currentVehicle];
-    vehicleImageEl.style.display = "block";
+  slot.occupied = true;
+  slot.startTime = Date.now();
+  slot.vehicle = currentVehicle;
+  slot.plate = detectedPlate;
+  activeSlot = slot;
+  vehicleInfo.textContent = "Vehicle: ".concat(currentVehicle);
+  plateInfo.textContent = "Plate: ".concat(detectedPlate);
+  statusText.textContent = "Parking at ".concat(zones[currentZone].name, " - Slot ").concat(slot.id);
+  vehicleImageEl.src = vehicleImages[currentVehicle];
+  vehicleImageEl.style.display = "block";
+  startTimer();
+  /* 🔥 CLEAR BIỂN SỐ ĐỂ QUÉT XE KHÁC */
 
-    var _existed = isVehicleAlreadyParked(detectedPlate);
-
-    startTimer();
-  } else {
-    var minutes = Math.floor((Date.now() - slot.startTime) / 60000);
-    var price = calculatePrice(minutes);
-    showQRBill({
-      zone: zones[currentZone].name,
-      slot: slot.id,
-      vehicle: slot.vehicle,
-      plate: slot.plate,
-      time: minutes,
-      price: price
-    });
-    stopTimer();
-    slot.occupied = false;
-    slot.startTime = null;
-    slot.vehicle = null;
-    slot.plate = null;
-    detectedPlate = null;
-    vehicleInfo.textContent = "Vehicle: —";
-    plateInfo.textContent = "Plate: —";
-    statusText.textContent = "Select a slot";
-    vehicleImageEl.style.display = "none";
-    document.getElementById("plateText").textContent = "—";
-  }
-
+  detectedPlate = null;
+  document.getElementById("plateText").textContent = "—";
   renderSlots();
 }
 
@@ -268,7 +242,7 @@ function showQRBill(data) {
   var qrDiv = document.getElementById("qrCode");
   var info = document.getElementById("billInfo");
   qrDiv.innerHTML = "";
-  var billText = "\nZone: ".concat(data.zone, "\nSlot: ").concat(data.slot, "\nVehicle: ").concat(data.vehicle, "\nPlate: ").concat(data.plate, "\nTime: ").concat(data.time, " minutes\nPrice: ").concat(data.price, " VND\n");
+  var billText = "\n    Zone: ".concat(data.zone, "\n    Slot: ").concat(data.slot, "\n    Vehicle: ").concat(data.vehicle, "\n    Plate: ").concat(data.plate, "\n    Time: ").concat(data.time, " minutes\n    Price: ").concat(data.price, " VND\n    ");
   new QRCode(qrDiv, {
     text: billText,
     width: 160,
@@ -277,6 +251,38 @@ function showQRBill(data) {
   info.innerText = billText;
   modal.style.display = "flex";
 }
+
+document.getElementById("continueBtn").onclick = function () {
+  document.getElementById("confirmModal").style.display = "none";
+  pendingSlot = null;
+};
+
+document.getElementById("leaveBtn").onclick = function () {
+  document.getElementById("confirmModal").style.display = "none";
+  if (!pendingSlot) return;
+  var minutes = Math.floor((Date.now() - pendingSlot.startTime) / 60000);
+  var price = calculatePrice(minutes);
+  showQRBill({
+    zone: zones[currentZone].name,
+    slot: pendingSlot.id,
+    vehicle: pendingSlot.vehicle,
+    plate: pendingSlot.plate,
+    time: minutes,
+    price: price
+  });
+  stopTimer();
+  pendingSlot.occupied = false;
+  pendingSlot.startTime = null;
+  pendingSlot.vehicle = null;
+  pendingSlot.plate = null;
+  activeSlot = null;
+  pendingSlot = null;
+  vehicleInfo.textContent = "Vehicle: —";
+  plateInfo.textContent = "Plate: —";
+  statusText.textContent = "Select a slot";
+  vehicleImageEl.style.display = "none";
+  renderSlots();
+};
 
 function closeQR() {
   document.getElementById("qrModal").style.display = "none";
